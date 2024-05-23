@@ -2,6 +2,8 @@
 - RA: 22092167-2
 - TURMA: ADSIS5S-N-A
 
+- Github SATIN: https://github.com/satinP
+- Github Topicos Especiais:  https://github.com/TI-UNICESUMAR/2024-topicos-especiais-ads5s
 
 # Entregas:
 - 1º Entrega: :white_check_mark:
@@ -115,7 +117,7 @@ Doc de como utilizar custom hooks
 
 #
 
-- 7º Entrega:
+- 7º Entrega: :x:
 A partir da atividade https://snack.expo.dev/@satinp/17-04, implementar as seguintes funcionalidades:
 
 - Adicionar um novo botão no gesto de swipe para a esquerda, para editar um item;
@@ -126,3 +128,23 @@ A partir da atividade https://snack.expo.dev/@satinp/17-04, implementar as segui
 Utilizei a cor lightgreen na cor de fundo do botão e o ícone edit do Ant Design.
 
 Repositório com o código: https://github.com/satinP/topicos-especiais-app
+
+#
+
+- 8º Entrega: :white_check_mark:
+https://forms.gle/RRE3rE8cA6MZ225q7
+https://dontpad.com/adsis5-22-05
+
+A partir da resolução da atividade da semana passada: https://snack.expo.dev/@satinp/15-05, ou pelo repositório: https://github.com/satinP/topicos-especiais-app
+
+Implementar a seguinte funcionalidade:
+
+Criar uma tela de login e privar a tab de Todo para usuários "logados":
+
+[X] Criar uma nova tela de Login, LoginScreen, que tenha inputs de usuário e senha e um botão de fazer login;
+[X] Adicionar uma validação na ToDoListStackNavigator, que mostre essa tela de Login para quem não estiver autenticado;
+[X] A autenticação será uma simulação, utilizando um dado no AsyncStorage, caso não tenha esse valor no AyncStorage, mostre a tela de login, caso exista o valor, mostre a TodoListScreen.
+
+Utilize o hook useAsyncStorage para verificar e atualizar o dado de usuário logado.
+
+Documentação sobre Autenticação utilizando o React Navigation: https://reactnavigation.org/docs/auth-flow/

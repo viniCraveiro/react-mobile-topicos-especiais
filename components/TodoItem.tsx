@@ -1,15 +1,14 @@
 import { AntDesign } from '@expo/vector-icons'
 import React from 'react'
 import {
-  View,
-  Text,
   Animated,
-  TouchableOpacity,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
 import { Swipeable } from 'react-native-gesture-handler'
 import TodoItemType from '../types/TodoItem'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const RightSwipeActions = ({
   item,

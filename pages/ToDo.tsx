@@ -1,20 +1,19 @@
+import { AntDesign } from '@expo/vector-icons'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import {
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
-  View,
-  FlatList,
-  Pressable,
   TouchableOpacity,
+  View
 } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { ToDoStackParamList } from '../navigation/StackNavigator'
 import Modal from '../components/Modal'
-import TodoItemType from '../types/TodoItem'
-import { useAsyncStorage } from '../hooks/useAsyncStorage'
 import TodoItemList from '../components/TodoItemList'
+import { useAsyncStorage } from '../hooks/useAsyncStorage'
+import { ToDoStackParamList } from '../navigation/StackNavigator'
+import TodoItemType from '../types/TodoItem'
 import { storageTodoListKey } from '../utils/constants'
 
 const initialTodoItem: TodoItemType = { id: 1, description: '', title: '' }
@@ -52,13 +51,23 @@ const TodoListScreen = ({ navigation }: TodoListScreenProps) => {
       alert('Descrição da tarefa inválida!')
       return
     }
-    setIsNew(true);
     if (!lsTodoItem.length) {
       setLsTodoItem([todoItem])
       setTodoItem(initialTodoItem)
       setModalVisible(false)
       return
     }
+
+    if (!isNew) {
+      console.log('Editando', todoItem)
+      const index = lsTodoItem.findIndex((todo) => todo.id === todoItem.id);
+      const todoItemListCopy = { ...lsTodoItem };
+      todoItemListCopy[index] = todoItem
+      setLsTodoItem(todoItemListCopy);
+      setModalVisible(false);
+      return
+    }
+    setIsNew(true);
 
     const todoItemListCopy = [...lsTodoItem]
 
@@ -89,6 +98,7 @@ const TodoListScreen = ({ navigation }: TodoListScreenProps) => {
 
   const handleEditItem = React.useCallback(
     (item: TodoItemType) => {
+      console.log('item', item)
       setModalVisible(true);
       setIsNew(false);
       const index = lsTodoItem.findIndex((todo) => todo.id === item.id)
@@ -135,24 +145,14 @@ const TodoListScreen = ({ navigation }: TodoListScreenProps) => {
         />
 
         {/* Botões da modal */}
-        {
-          isNew ? <View style={{ flexDirection: 'row', gap: 5 }}>
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={handleAddItem}
-            >
-              <Text style={styles.textStyle}>Adicionar</Text>
-            </Pressable>
-          </View> : <View style={{ flexDirection: 'row', gap: 5 }}>
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={handleAddItem}
-            >
-              <Text style={styles.textStyle}>Editar</Text>
-            </Pressable>
-          </View>
-        }
-
+        <View style={{ flexDirection: 'row', gap: 5 }}>
+          <Pressable
+            style={[styles.button, styles.buttonClose]}
+            onPress={handleAddItem}
+          >
+            <Text style={styles.textStyle}>{isNew ? 'Adicionar' : 'Editar'}</Text>
+          </Pressable>
+        </View>
       </Modal>
 
       {/* Lista de tarefas salvas */}

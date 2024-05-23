@@ -1,11 +1,14 @@
-import React from 'react'
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from '@react-navigation/native-stack'
-import SquirtleScreen from '../pages/SquirtleScreen'
+import React from 'react'
+import { useAsyncStorage } from '../hooks/useAsyncStorage'
+import LoginScreen from '../pages/LoginScreen'
 import PokemonScreen from '../pages/PokemonScreen'
+import SquirtleScreen from '../pages/SquirtleScreen'
 import TodoListScreen from '../pages/ToDo'
+import { userTokenKey } from '../utils/constants'
 
 // Tipagem para as rotas do Squirtle e Pokemon, com parmâmetros
 
@@ -49,7 +52,8 @@ const MainStackNavigator = () => {
 }
 
 export type ToDoStackParamList = {
-  TodoList: undefined
+  TodoList: undefined,
+  Login: undefined
 }
 
 const TodoStack = createNativeStackNavigator<ToDoStackParamList>()
@@ -65,18 +69,35 @@ const todoScreenOptionStyle: NativeStackNavigationOptions = {
   headerTitleAlign: 'center',
 }
 
+// const AuthContext = React.createContext({});
+
 // TodoList Stack, rotas daTodoList
 
 const ToDoListStackNavigator = () => {
+  const [token, setToken] = useAsyncStorage(userTokenKey, undefined)
+
+  // const authContext = React.useMemo(() => ({}),
+  //   []
+  // );
   return (
+    // <AuthContext.Provider value={authContext}>
     <TodoStack.Navigator screenOptions={todoScreenOptionStyle}>
-      <TodoStack.Screen
-        name="TodoList"
-        options={{ title: 'Todo List' }}
-        component={TodoListScreen}
-      />
+      {
+        token ? <TodoStack.Screen
+          name="TodoList"
+          options={{ title: 'Todo List' }}
+          component={TodoListScreen}
+        /> : <TodoStack.Screen
+          name="Login"
+          options={{ title: 'Login' }}
+          component={LoginScreen}
+        // initialParams={()=>setToken}
+        />
+      }
     </TodoStack.Navigator>
+    // </AuthContext.Provider >
   )
 }
 
 export { MainStackNavigator, ToDoListStackNavigator }
+
