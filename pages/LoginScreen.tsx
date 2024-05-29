@@ -13,11 +13,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ToDoStackParamList } from '../navigation/StackNavigator';
 
 type LoginScreenProps = NativeStackScreenProps<
-ToDoStackParamList,
-'Login'
+  ToDoStackParamList,
+  'Login'
 >
 
-const LoginScreen = ({ navigation }: LoginScreenProps) => {
+const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
+  const { setToken } = route.params;
   const [username, setUsername] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [lsLogin, setLsLogin] = useAsyncStorage<TLogin | undefined>(
@@ -28,9 +29,10 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
   // const { setUserToken } = route.params;
 
   const handleLogin = () => {
-    if (username.trim() != '' && password.trim() != null){
+    if (username.trim() != '' && password.trim() != null) {
       console.log('Logando com usuario: ', username, ' e com a senha: ', password)
-      setLsLogin({ username, password })
+      // setLsLogin({ username, password })
+      setToken(username + password)
       navigation.navigate("TodoList")
     } else {
       console.error('Usuário ou senha invalido.')
@@ -55,7 +57,7 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
       />
       <Pressable
         style={[styles.button]}
-        onPress={handleLogin}
+        onPress={()=> handleLogin()}
       >
         <Text style={styles.textButton}>Logar</Text>
       </Pressable>

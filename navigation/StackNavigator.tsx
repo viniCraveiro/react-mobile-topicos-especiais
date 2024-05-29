@@ -53,7 +53,7 @@ const MainStackNavigator = () => {
 
 export type ToDoStackParamList = {
   TodoList: undefined,
-  Login: undefined
+  Login: { setToken: (v: string) => void; }
 }
 
 const TodoStack = createNativeStackNavigator<ToDoStackParamList>()
@@ -69,18 +69,11 @@ const todoScreenOptionStyle: NativeStackNavigationOptions = {
   headerTitleAlign: 'center',
 }
 
-// const AuthContext = React.createContext({});
-
-// TodoList Stack, rotas daTodoList
-
 const ToDoListStackNavigator = () => {
-  const [token, setToken] = useAsyncStorage(userTokenKey, undefined)
+  const [token, setToken] = useAsyncStorage(userTokenKey, '')
 
-  // const authContext = React.useMemo(() => ({}),
-  //   []
-  // );
+
   return (
-    // <AuthContext.Provider value={authContext}>
     <TodoStack.Navigator screenOptions={todoScreenOptionStyle}>
       {
         token ? <TodoStack.Screen
@@ -91,11 +84,10 @@ const ToDoListStackNavigator = () => {
           name="Login"
           options={{ title: 'Login' }}
           component={LoginScreen}
-        // initialParams={()=>setToken}
+          initialParams={{ setToken }}
         />
       }
     </TodoStack.Navigator>
-    // </AuthContext.Provider >
   )
 }
 
