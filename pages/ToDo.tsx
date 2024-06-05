@@ -1,22 +1,20 @@
-import { AntDesign } from '@expo/vector-icons'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import {
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
+  View,
+  Pressable,
   TouchableOpacity,
-  View
 } from 'react-native'
-import Modal from '../components/Modal'
-import TodoItemList from '../components/TodoItemList'
-import { useAsyncStorage } from '../hooks/useAsyncStorage'
+import { AntDesign } from '@expo/vector-icons'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { ToDoStackParamList } from '../navigation/StackNavigator'
+import Modal from '../components/Modal'
 import TodoItemType from '../types/TodoItem'
-import { storageTodoListKey } from '../utils/constants'
+import TodoItemList from '../components/TodoItemList'
 
-const initialTodoItem: TodoItemType = { id: 1, description: '', title: '' }
+const initialTodoItem: TodoItemType = { description: '', title: '' }
 
 type TodoListScreenProps = NativeStackScreenProps<
   ToDoStackParamList,
@@ -25,19 +23,36 @@ type TodoListScreenProps = NativeStackScreenProps<
 
 const TodoListScreen = ({ navigation }: TodoListScreenProps) => {
   const [modalVisible, setModalVisible] = React.useState(false)
+  const [isEdit, setIsEdit] = React.useState(false)
   const [todoItem, setTodoItem] = React.useState<TodoItemType>(initialTodoItem)
-  const [isNew, setIsNew] = React.useState<boolean>(false);
+  const [todoList, setTodoList] = React.useState<TodoItemType[]>([])
 
-  const [lsTodoItem, setLsTodoItem] = useAsyncStorage<TodoItemType[]>(
-    storageTodoListKey,
-    []
-  )
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchTodos()
+    })
+
+    async function fetchTodos() {
+      try {
+        const res = await fetch('http://localhost:3000/tasks')
+        const data = await res.json()
+        setTodoList(data)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    return unsubscribe
+  }, [navigation])
 
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
-          onPress={() => setModalVisible(true)}
+          onPress={() => {
+            setIsEdit(false)
+            setModalVisible(true)
+          }}
           style={{ padding: 15 }}
         >
           <AntDesign name="pluscircle" size={24} color="darkseagreen" />
@@ -51,75 +66,87 @@ const TodoListScreen = ({ navigation }: TodoListScreenProps) => {
       alert('Descrição da tarefa inválida!')
       return
     }
-    if (!lsTodoItem.length) {
-      setLsTodoItem([todoItem])
-      setTodoItem(initialTodoItem)
+
+    if (isEdit) {
+      const index = todoList.findIndex((todo) => todo.id === todoItem.id)
+      try {
+        fetch('http://localhost:3000/tasks/id/' + todoItem.id, {
+          method: 'PATCH',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(todoItem),
+        })
+        const todoItemListCopy = [...todoList]
+
+        todoItemListCopy[index] = todoItem
+
+        setTodoList(todoItemListCopy)
+        setTodoItem(initialTodoItem)
+      } catch (e) {
+        console.log(e)
+      }
+
       setModalVisible(false)
       return
     }
 
-    if (!isNew) {
-      console.log('Editando', todoItem)
-      const index = lsTodoItem.findIndex((todo) => todo.id === todoItem.id);
-      const todoItemListCopy = { ...lsTodoItem };
-      todoItemListCopy[index] = todoItem
-      setLsTodoItem(todoItemListCopy);
-      setModalVisible(false);
-      return
-    }
-    setIsNew(true);
-
-    const todoItemListCopy = [...lsTodoItem]
-
-    const lastItemIdPlusOne = lsTodoItem[lsTodoItem.length - 1].id + 1
-
-    const newItem: TodoItemType = {
-      ...todoItem,
-      id: lastItemIdPlusOne,
+    try {
+      fetch('http://localhost:3000/tasks', {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(todoItem),
+      })
+      const todoItemListCopy = [...todoList]
+      todoItemListCopy.push(todoItem)
+      setTodoList(todoItemListCopy)
+      setTodoItem(initialTodoItem)
+    } catch (e) {
+      console.log(e)
     }
 
-    todoItemListCopy.push(newItem)
-
-    setLsTodoItem(todoItemListCopy)
-    setTodoItem(initialTodoItem)
     setModalVisible(false)
   }
 
-  const handleDeleteItem = React.useCallback(
-    (item: TodoItemType) => {
-      const index = lsTodoItem.findIndex((todo) => todo.id === item.id)
+  const handleDeleteItem = (item: TodoItemType) => {
+    const index = todoList.findIndex((todo) => todo.id === todoItem.id)
 
-      const todoItemListCopy = lsTodoItem.toSpliced(index, 1)
+    try {
+      fetch('http://localhost:3000/tasks/id/' + item?.id, {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
 
-      setLsTodoItem(todoItemListCopy)
-    },
-    [lsTodoItem]
-  )
+      const todoItemListCopy = todoList.toSpliced(index, 1)
 
-  const handleEditItem = React.useCallback(
-    (item: TodoItemType) => {
-      console.log('item', item)
-      setModalVisible(true);
-      setIsNew(false);
-      const index = lsTodoItem.findIndex((todo) => todo.id === item.id)
-      const itemRecovered = lsTodoItem.find(todo => todo.id === item.id);
-      if (itemRecovered) {
-        setTodoItem(itemRecovered)
-        itemRecovered.description = item.description;
-        itemRecovered.title = item.title;
-        const todoItemListCopy = lsTodoItem.toSpliced(index, 1, itemRecovered)
-        setLsTodoItem(todoItemListCopy)
-      }
-    },
-    [lsTodoItem]
-  )
+      setTodoList(todoItemListCopy)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const handleEditItem = (item: TodoItemType) => {
+    setTodoItem(item)
+    setModalVisible(true)
+    setIsEdit(true)
+  }
 
   return (
     <View style={styles.container}>
       {/* Modal do nosso projeto */}
       <Modal
         modalVisible={modalVisible}
-        onCloseModal={() => setModalVisible(!modalVisible)}
+        onCloseModal={() => {
+          setModalVisible(!modalVisible)
+          setTodoItem(initialTodoItem)
+        }}
         title="Descreva a tarefa"
       >
         {/* Input para guardar o titulo */}
@@ -150,13 +177,20 @@ const TodoListScreen = ({ navigation }: TodoListScreenProps) => {
             style={[styles.button, styles.buttonClose]}
             onPress={handleAddItem}
           >
-            <Text style={styles.textStyle}>{isNew ? 'Adicionar' : 'Editar'}</Text>
+            <Text style={styles.textStyle}>
+              {isEdit ? 'Editar' : 'Adicionar'}
+            </Text>
           </Pressable>
         </View>
       </Modal>
 
       {/* Lista de tarefas salvas */}
-      <TodoItemList key={JSON.stringify(lsTodoItem)} onDelete={handleDeleteItem} onEdit={handleEditItem} />
+      <TodoItemList
+        todoList={todoList}
+        key={JSON.stringify(todoList)}
+        onDelete={handleDeleteItem}
+        onEdit={handleEditItem}
+      />
     </View>
   )
 }

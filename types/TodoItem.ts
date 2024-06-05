@@ -1,7 +1,7 @@
 type TodoItem = {
-  id: number
+  id?: number
   title: string
   description: string
 }
 
-export default TodoItem;
+export default TodoItem

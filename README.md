@@ -148,3 +148,12 @@ Criar uma tela de login e privar a tab de Todo para usuários "logados":
 Utilize o hook useAsyncStorage para verificar e atualizar o dado de usuário logado.
 
 Documentação sobre Autenticação utilizando o React Navigation: https://reactnavigation.org/docs/auth-flow/
+
+#
+
+- 9º Entrega: :white_check_mark:
+Entreguei porem o github zoou e nao salvou as alterações, subindo agora.
+
+#
+
+- 10º Entrega: :white_check_mark:
