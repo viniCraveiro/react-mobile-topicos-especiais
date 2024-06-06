@@ -157,3 +157,22 @@ Entreguei porem o github zoou e nao salvou as alterações, subindo agora.
 #
 
 - 10º Entrega: :white_check_mark:
+
+https://dontpad.com/adsis5s-5-6-24
+
+https://forms.gle/RB9hfaWfWnDZemS57
+
+Criar e publicar uma imagem Docker da api: https://github.com/TI-UNICESUMAR/2024-topicos-especiais-ads5s/blob/main/2024-06-05-docker/index.js
+
+- Utilizar a última versão do node;
+- Copiar os arquivos necessários para rodar a api;
+- Expor a porta 3001;
+- Inicializar a api;
+- Publicar no dockerhub;
+
+
+Site do dockerhub: http://dockerhub.com/
+Slides docker 
+Principais comandos Dockerfile
+Tutorial do site do docker: https://docs.docker.com/get-started/
+Como publicar no dockerhub: https://docs.docker.com/get-started/04_sharing_app/
